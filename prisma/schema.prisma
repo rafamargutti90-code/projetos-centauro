@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Produto {
+  id            String   @id @default(cuid())
+  codigo        String   @unique
+  nome          String
+  categoria     String
+  fornecedor    String
+  custoUnitario Float
+  unidade       String   @default("UN")
+  ncm           String?
+  ativo         Boolean  @default(true)
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+
+  historicos HistoricoCalculo[]
+
+  @@map("produtos")
+}
+
+model PerfilFiscal {
+  id        String   @id @default(cuid())
+  nome      String
+  descricao String?
+  icms      Float    @default(18.0)
+  pis       Float    @default(0.65)
+  cofins    Float    @default(3.0)
+  ipi       Float    @default(0.0)
+  icmsST    Float?
+  ativo     Boolean  @default(true)
+  padrao    Boolean  @default(false)
+  criadoEm  DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  historicos HistoricoCalculo[]
+
+  @@map("perfis_fiscais")
+}
+
+model ConfiguracaoOperacional {
+  id                   String   @id @default(cuid())
+  despesasOperacionais Float    @default(8.0)
+  comissaoVendedor     Float    @default(3.0)
+  fretePercentual      Float?
+  freteFixo            Float?
+  margemLucroPadrao    Float    @default(15.0)
+  atualizadoEm         DateTime @updatedAt
+
+  @@map("configuracoes_operacionais")
+}
+
+model HistoricoCalculo {
+  id               String   @id @default(cuid())
+  produtoId        String?
+  produto          Produto? @relation(fields: [produtoId], references: [id], onDelete: SetNull)
+  produtoNome      String
+  produtoCodigo    String
+  perfilFiscalId   String?
+  perfilFiscal     PerfilFiscal? @relation(fields: [perfilFiscalId], references: [id], onDelete: SetNull)
+  perfilFiscalNome String
+
+  custoUnitario        Float
+  icms                 Float
+  pis                  Float
+  cofins               Float
+  ipi                  Float
+  margemLucro          Float
+  comissaoVendedor     Float
+  despesasOperacionais Float
+  fretePercentual      Float?
+  freteFixo            Float?
+
+  totalImpostos       Float
+  totalDespesas       Float
+  markupDivisor       Float
+  markupMultiplicador Float
+  precoVenda          Float
+  lucroUnitario       Float
+
+  valorImpostos Float
+  valorComissao Float
+  valorDespesas Float
+  valorFrete    Float
+  valorLucro    Float
+
+  observacao String?
+  criadoEm   DateTime @default(now())
+
+  @@map("historico_calculos")
+}
