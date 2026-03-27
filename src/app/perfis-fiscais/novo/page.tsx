@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { savePerfilFiscal } from '@/lib/storage';
 
 export default function NovoPerfilFiscalPage() {
   const router = useRouter();
@@ -34,26 +35,16 @@ export default function NovoPerfilFiscalPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/perfis-fiscais', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nome: form.nome,
-          descricao: form.descricao || undefined,
-          icms: parseFloat(form.icms),
-          pis: parseFloat(form.pis),
-          cofins: parseFloat(form.cofins),
-          ipi: parseFloat(form.ipi),
-          icmsST: form.icmsST ? parseFloat(form.icmsST) : null,
-          padrao: form.padrao,
-        }),
+      savePerfilFiscal({
+        nome: form.nome,
+        descricao: form.descricao || null,
+        icms: parseFloat(form.icms),
+        pis: parseFloat(form.pis),
+        cofins: parseFloat(form.cofins),
+        ipi: parseFloat(form.ipi),
+        icmsST: form.icmsST ? parseFloat(form.icmsST) : null,
+        padrao: form.padrao,
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Erro ao criar perfil fiscal');
-      }
-
       router.push('/perfis-fiscais');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar perfil fiscal');

@@ -3,42 +3,26 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatPercent } from '@/lib/formatting';
-
-interface PerfilFiscal {
-  id: string;
-  nome: string;
-  descricao: string | null;
-  icms: number;
-  pis: number;
-  cofins: number;
-  ipi: number;
-  icmsST: number | null;
-  padrao: boolean;
-  ativo: boolean;
-}
+import { getPerfisFiscais, deletePerfilFiscal, type PerfilFiscal } from '@/lib/storage';
 
 export default function PerfisFiscaisPage() {
   const [perfis, setPerfis] = useState<PerfilFiscal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('/api/perfis-fiscais')
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao carregar perfis fiscais');
-        return res.json();
-      })
-      .then(setPerfis)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      setPerfis(getPerfisFiscais());
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const handleDelete = async (id: string, nome: string) => {
+  const handleDelete = (id: string, nome: string) => {
     if (!confirm(`Tem certeza que deseja excluir "${nome}"?`)) return;
-
     try {
-      const res = await fetch(`/api/perfis-fiscais/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Erro ao excluir');
+      deletePerfilFiscal(id);
       setPerfis((prev) => prev.filter((p) => p.id !== id));
     } catch {
       alert('Erro ao excluir perfil fiscal');
@@ -56,10 +40,6 @@ export default function PerfisFiscaisPage() {
           Novo Perfil Fiscal
         </Link>
       </div>
-
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">{error}</div>
-      )}
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Carregando...</div>

@@ -2,42 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { formatBRL, formatPercent } from '@/lib/formatting';
-
-interface Produto {
-  id: string;
-  codigo: string;
-  nome: string;
-  custoUnitario: number;
-}
-
-interface PerfilFiscal {
-  id: string;
-  nome: string;
-  icms: number;
-  pis: number;
-  cofins: number;
-  ipi: number;
-}
-
-interface CalculoResult {
-  custoBase: number;
-  totalImpostosPercent: number;
-  totalDespesasPercent: number;
-  markupDivisor: number;
-  markupMultiplicador: number;
-  precoVendaSemIPI: number;
-  valorIPI: number;
-  precoVendaFinal: number;
-  valorICMS: number;
-  valorPIS: number;
-  valorCOFINS: number;
-  valorComissao: number;
-  valorDespesas: number;
-  valorFrete: number;
-  valorLucro: number;
-  lucroUnitario: number;
-  margemReal: number;
-}
+import { calcularPreco, type CalculoResult } from '@/lib/pricing';
+import { getProdutos, getPerfisFiscais, getConfiguracao, saveHistoricoItem, type Produto, type PerfilFiscal } from '@/lib/storage';
 
 export default function CalculadoraPage() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -67,22 +33,19 @@ export default function CalculadoraPage() {
 
   // Load produtos, perfis, and config on mount
   useEffect(() => {
-    Promise.all([
-      fetch('/api/produtos').then((r) => r.json()),
-      fetch('/api/perfis-fiscais').then((r) => r.json()),
-      fetch('/api/configuracoes').then((r) => r.json()),
-    ]).then(([prods, perfs, config]) => {
-      setProdutos(prods);
-      setPerfis(perfs);
-      setForm((prev) => ({
-        ...prev,
-        despesasOperacionais: config.despesasOperacionais?.toString() || prev.despesasOperacionais,
-        comissaoVendedor: config.comissaoVendedor?.toString() || prev.comissaoVendedor,
-        margemLucro: config.margemLucroPadrao?.toString() || prev.margemLucro,
-        fretePercentual: config.fretePercentual?.toString() || '0',
-        freteFixo: config.freteFixo?.toString() || '0',
-      }));
-    });
+    const prods = getProdutos();
+    const perfs = getPerfisFiscais();
+    const config = getConfiguracao();
+    setProdutos(prods);
+    setPerfis(perfs);
+    setForm((prev) => ({
+      ...prev,
+      despesasOperacionais: config.despesasOperacionais?.toString() || prev.despesasOperacionais,
+      comissaoVendedor: config.comissaoVendedor?.toString() || prev.comissaoVendedor,
+      margemLucro: config.margemLucroPadrao?.toString() || prev.margemLucro,
+      fretePercentual: config.fretePercentual?.toString() || '0',
+      freteFixo: config.freteFixo?.toString() || '0',
+    }));
   }, []);
 
   // When product selected, fill custoUnitario
@@ -119,14 +82,14 @@ export default function CalculadoraPage() {
     setSaved(false);
   };
 
-  const handleCalcular = async () => {
+  const handleCalcular = () => {
     setError('');
     setLoading(true);
     setResultado(null);
     setSaved(false);
 
     try {
-      const payload = {
+      const result = calcularPreco({
         custoUnitario: parseFloat(form.custoUnitario),
         icms: parseFloat(form.icms),
         pis: parseFloat(form.pis),
@@ -137,21 +100,8 @@ export default function CalculadoraPage() {
         despesasOperacionais: parseFloat(form.despesasOperacionais),
         fretePercentual: freteMode === 'percentual' ? parseFloat(form.fretePercentual) : undefined,
         freteFixo: freteMode === 'fixo' ? parseFloat(form.freteFixo) : undefined,
-      };
-
-      const res = await fetch('/api/calcular', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Erro ao calcular');
-      }
-
-      const data = await res.json();
-      setResultado(data);
+      setResultado(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao calcular preco');
     } finally {
@@ -159,7 +109,7 @@ export default function CalculadoraPage() {
     }
   };
 
-  const handleSalvar = async () => {
+  const handleSalvar = () => {
     if (!resultado) return;
     setSaving(true);
 
@@ -167,7 +117,7 @@ export default function CalculadoraPage() {
     const perfil = perfis.find((p) => p.id === selectedPerfilId);
 
     try {
-      const payload = {
+      saveHistoricoItem({
         produtoId: selectedProdutoId || null,
         produtoNome: produto?.nome || 'Produto avulso',
         produtoCodigo: produto?.codigo || '---',
@@ -194,15 +144,8 @@ export default function CalculadoraPage() {
         valorDespesas: resultado.valorDespesas,
         valorFrete: resultado.valorFrete,
         valorLucro: resultado.valorLucro,
-      };
-
-      const res = await fetch('/api/historico', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        observacao: null,
       });
-
-      if (!res.ok) throw new Error('Erro ao salvar');
       setSaved(true);
     } catch {
       alert('Erro ao salvar no historico');

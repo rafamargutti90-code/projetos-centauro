@@ -2,42 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { formatBRL, formatPercent } from '@/lib/formatting';
-
-interface Produto {
-  id: string;
-  codigo: string;
-  nome: string;
-  custoUnitario: number;
-}
-
-interface PerfilFiscal {
-  id: string;
-  nome: string;
-  icms: number;
-  pis: number;
-  cofins: number;
-  ipi: number;
-}
-
-interface CalculoResult {
-  custoBase: number;
-  totalImpostosPercent: number;
-  totalDespesasPercent: number;
-  markupDivisor: number;
-  markupMultiplicador: number;
-  precoVendaSemIPI: number;
-  valorIPI: number;
-  precoVendaFinal: number;
-  valorICMS: number;
-  valorPIS: number;
-  valorCOFINS: number;
-  valorComissao: number;
-  valorDespesas: number;
-  valorFrete: number;
-  valorLucro: number;
-  lucroUnitario: number;
-  margemReal: number;
-}
+import { calcularPreco, type CalculoResult } from '@/lib/pricing';
+import { getProdutos, getPerfisFiscais, getConfiguracao, type Produto, type PerfilFiscal } from '@/lib/storage';
 
 interface Cenario {
   id: number;
@@ -79,24 +45,21 @@ export default function SimulacaoPage() {
   let nextId = cenarios.length + 1;
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/produtos').then((r) => r.json()),
-      fetch('/api/perfis-fiscais').then((r) => r.json()),
-      fetch('/api/configuracoes').then((r) => r.json()),
-    ]).then(([prods, perfs, config]) => {
-      setProdutos(prods);
-      setPerfis(perfs);
-      const updatedForm = {
-        ...defaultForm,
-        despesasOperacionais: config.despesasOperacionais?.toString() || '8',
-        comissaoVendedor: config.comissaoVendedor?.toString() || '3',
-        margemLucro: config.margemLucroPadrao?.toString() || '15',
-        fretePercentual: config.fretePercentual?.toString() || '0',
-      };
-      setCenarios((prev) =>
-        prev.map((c) => ({ ...c, form: { ...c.form, ...updatedForm } }))
-      );
-    });
+    const prods = getProdutos();
+    const perfs = getPerfisFiscais();
+    const config = getConfiguracao();
+    setProdutos(prods);
+    setPerfis(perfs);
+    const updatedForm = {
+      ...defaultForm,
+      despesasOperacionais: config.despesasOperacionais?.toString() || '8',
+      comissaoVendedor: config.comissaoVendedor?.toString() || '3',
+      margemLucro: config.margemLucroPadrao?.toString() || '15',
+      fretePercentual: config.fretePercentual?.toString() || '0',
+    };
+    setCenarios((prev) =>
+      prev.map((c) => ({ ...c, form: { ...c.form, ...updatedForm } }))
+    );
   }, []);
 
   const addCenario = () => {
@@ -164,7 +127,7 @@ export default function SimulacaoPage() {
     }
   };
 
-  const calcular = async (cenarioId: number) => {
+  const calcular = (cenarioId: number) => {
     const cenario = cenarios.find((c) => c.id === cenarioId);
     if (!cenario) return;
 
@@ -173,7 +136,7 @@ export default function SimulacaoPage() {
     );
 
     try {
-      const payload = {
+      const resultado = calcularPreco({
         custoUnitario: parseFloat(cenario.form.custoUnitario),
         icms: parseFloat(cenario.form.icms),
         pis: parseFloat(cenario.form.pis),
@@ -183,20 +146,7 @@ export default function SimulacaoPage() {
         comissaoVendedor: parseFloat(cenario.form.comissaoVendedor),
         despesasOperacionais: parseFloat(cenario.form.despesasOperacionais),
         fretePercentual: parseFloat(cenario.form.fretePercentual),
-      };
-
-      const res = await fetch('/api/calcular', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Erro ao calcular');
-      }
-
-      const resultado = await res.json();
       setCenarios((prev) =>
         prev.map((c) => (c.id === cenarioId ? { ...c, resultado, loading: false } : c))
       );

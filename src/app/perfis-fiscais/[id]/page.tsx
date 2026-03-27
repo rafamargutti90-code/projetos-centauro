@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { getPerfilFiscalById, savePerfilFiscal } from '@/lib/storage';
 
 export default function EditarPerfilFiscalPage() {
   const router = useRouter();
@@ -24,12 +25,11 @@ export default function EditarPerfilFiscalPage() {
   });
 
   useEffect(() => {
-    fetch(`/api/perfis-fiscais/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Perfil fiscal nao encontrado');
-        return res.json();
-      })
-      .then((perfil) => {
+    try {
+      const perfil = getPerfilFiscalById(id);
+      if (!perfil) {
+        setError('Perfil fiscal nao encontrado');
+      } else {
         setForm({
           nome: perfil.nome,
           descricao: perfil.descricao || '',
@@ -40,9 +40,12 @@ export default function EditarPerfilFiscalPage() {
           icmsST: perfil.icmsST != null ? perfil.icmsST.toString() : '',
           padrao: perfil.padrao,
         });
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar perfil fiscal');
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -60,26 +63,17 @@ export default function EditarPerfilFiscalPage() {
     setSaving(true);
 
     try {
-      const res = await fetch(`/api/perfis-fiscais/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nome: form.nome,
-          descricao: form.descricao || undefined,
-          icms: parseFloat(form.icms),
-          pis: parseFloat(form.pis),
-          cofins: parseFloat(form.cofins),
-          ipi: parseFloat(form.ipi),
-          icmsST: form.icmsST ? parseFloat(form.icmsST) : null,
-          padrao: form.padrao,
-        }),
+      savePerfilFiscal({
+        id,
+        nome: form.nome,
+        descricao: form.descricao || null,
+        icms: parseFloat(form.icms),
+        pis: parseFloat(form.pis),
+        cofins: parseFloat(form.cofins),
+        ipi: parseFloat(form.ipi),
+        icmsST: form.icmsST ? parseFloat(form.icmsST) : null,
+        padrao: form.padrao,
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Erro ao atualizar perfil fiscal');
-      }
-
       router.push('/perfis-fiscais');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao atualizar perfil fiscal');

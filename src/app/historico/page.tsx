@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatBRL, formatPercent } from '@/lib/formatting';
+import { getHistorico, deleteHistoricoItem, exportHistoricoCSV } from '@/lib/storage';
 
 interface HistoricoItem {
   id: string;
@@ -24,61 +25,40 @@ export default function HistoricoPage() {
   const [historicos, setHistoricos] = useState<HistoricoItem[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 20, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [exporting, setExporting] = useState(false);
 
-  const fetchHistorico = (page: number) => {
+  const loadHistorico = (page: number) => {
     setLoading(true);
-    fetch(`/api/historico?page=${page}&limit=20`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao carregar historico');
-        return res.json();
-      })
-      .then((data) => {
-        setHistoricos(data.data);
-        setPagination(data.pagination);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      const result = getHistorico(page, 20);
+      setHistoricos(result.data);
+      setPagination(result.pagination);
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchHistorico(1);
+    loadHistorico(1);
   }, []);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm('Tem certeza que deseja excluir este registro?')) return;
-
     try {
-      const res = await fetch(`/api/historico/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Erro ao excluir');
-      fetchHistorico(pagination.page);
+      deleteHistoricoItem(id);
+      loadHistorico(pagination.page);
     } catch {
       alert('Erro ao excluir registro');
     }
   };
 
-  const handleExportar = async () => {
+  const handleExportar = () => {
     setExporting(true);
     try {
       const ids = historicos.map((h) => h.id);
-      const res = await fetch('/api/exportar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!res.ok) throw new Error('Erro ao exportar');
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'historico-calculos.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      exportHistoricoCSV(ids);
     } catch {
       alert('Erro ao exportar CSV');
     } finally {
@@ -100,10 +80,6 @@ export default function HistoricoPage() {
           </button>
         )}
       </div>
-
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">{error}</div>
-      )}
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Carregando...</div>
@@ -166,7 +142,7 @@ export default function HistoricoPage() {
           {pagination.totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-6">
               <button
-                onClick={() => fetchHistorico(pagination.page - 1)}
+                onClick={() => loadHistorico(pagination.page - 1)}
                 disabled={pagination.page === 1}
                 className="px-4 py-2 rounded-lg border border-gray-300 text-sm disabled:opacity-50 hover:bg-gray-50"
               >
@@ -176,7 +152,7 @@ export default function HistoricoPage() {
                 Pagina {pagination.page} de {pagination.totalPages} ({pagination.total} registros)
               </span>
               <button
-                onClick={() => fetchHistorico(pagination.page + 1)}
+                onClick={() => loadHistorico(pagination.page + 1)}
                 disabled={pagination.page === pagination.totalPages}
                 className="px-4 py-2 rounded-lg border border-gray-300 text-sm disabled:opacity-50 hover:bg-gray-50"
               >

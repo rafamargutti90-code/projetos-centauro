@@ -3,55 +3,40 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatBRL } from '@/lib/formatting';
-
-interface Produto {
-  id: string;
-  codigo: string;
-  nome: string;
-  categoria: string;
-  fornecedor: string;
-  custoUnitario: number;
-  unidade: string;
-  ncm: string | null;
-  ativo: boolean;
-}
+import { getProdutos, deleteProduto, type Produto } from '@/lib/storage';
 
 export default function ProdutosPage() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  const fetchProdutos = (query: string) => {
+  const loadProdutos = (query: string) => {
     setLoading(true);
-    const url = query ? `/api/produtos?search=${encodeURIComponent(query)}` : '/api/produtos';
-    fetch(url)
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao carregar produtos');
-        return res.json();
-      })
-      .then(setProdutos)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      const result = getProdutos(query || undefined);
+      setProdutos(result);
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchProdutos('');
+    loadProdutos('');
   }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      fetchProdutos(search);
+      loadProdutos(search);
     }, 300);
     return () => clearTimeout(timeout);
   }, [search]);
 
-  const handleDelete = async (id: string, nome: string) => {
+  const handleDelete = (id: string, nome: string) => {
     if (!confirm(`Tem certeza que deseja excluir "${nome}"?`)) return;
-
     try {
-      const res = await fetch(`/api/produtos/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Erro ao excluir');
+      deleteProduto(id);
       setProdutos((prev) => prev.filter((p) => p.id !== id));
     } catch {
       alert('Erro ao excluir produto');
@@ -79,10 +64,6 @@ export default function ProdutosPage() {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] bg-white"
         />
       </div>
-
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">{error}</div>
-      )}
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Carregando...</div>

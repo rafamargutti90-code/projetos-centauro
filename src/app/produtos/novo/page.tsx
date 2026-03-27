@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CATEGORIAS, UNIDADES } from '@/lib/constants';
+import { saveProduto } from '@/lib/storage';
 
 export default function NovoProdutoPage() {
   const router = useRouter();
@@ -29,21 +30,15 @@ export default function NovoProdutoPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/produtos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          custoUnitario: parseFloat(form.custoUnitario),
-          ncm: form.ncm || undefined,
-        }),
+      saveProduto({
+        codigo: form.codigo,
+        nome: form.nome,
+        categoria: form.categoria,
+        fornecedor: form.fornecedor,
+        custoUnitario: parseFloat(form.custoUnitario),
+        unidade: form.unidade,
+        ncm: form.ncm || null,
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Erro ao criar produto');
-      }
-
       router.push('/produtos');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar produto');

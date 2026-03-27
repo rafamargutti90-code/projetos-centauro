@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { formatBRL, formatPercent } from '@/lib/formatting';
+import { getDashboardData } from '@/lib/storage';
 import Link from 'next/link';
 
 interface DashboardData {
@@ -25,31 +26,22 @@ interface DashboardData {
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('/api/dashboard')
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao carregar dados');
-        return res.json();
-      })
-      .then(setData)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      const dashData = getDashboardData();
+      setData(dashData);
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-[#1B2A4A] text-lg">Carregando...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-red-600 text-lg">{error}</div>
       </div>
     );
   }

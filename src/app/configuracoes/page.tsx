@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getConfiguracao, saveConfiguracao } from '@/lib/storage';
 
 export default function ConfiguracoesPage() {
   const [loading, setLoading] = useState(true);
@@ -17,22 +18,20 @@ export default function ConfiguracoesPage() {
   });
 
   useEffect(() => {
-    fetch('/api/configuracoes')
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao carregar configuracoes');
-        return res.json();
-      })
-      .then((config) => {
-        setForm({
-          despesasOperacionais: config.despesasOperacionais?.toString() || '8',
-          comissaoVendedor: config.comissaoVendedor?.toString() || '3',
-          fretePercentual: config.fretePercentual?.toString() || '',
-          freteFixo: config.freteFixo?.toString() || '',
-          margemLucroPadrao: config.margemLucroPadrao?.toString() || '15',
-        });
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      const config = getConfiguracao();
+      setForm({
+        despesasOperacionais: config.despesasOperacionais?.toString() || '8',
+        comissaoVendedor: config.comissaoVendedor?.toString() || '3',
+        fretePercentual: config.fretePercentual?.toString() || '',
+        freteFixo: config.freteFixo?.toString() || '',
+        margemLucroPadrao: config.margemLucroPadrao?.toString() || '15',
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar configuracoes');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,23 +46,13 @@ export default function ConfiguracoesPage() {
     setSaving(true);
 
     try {
-      const res = await fetch('/api/configuracoes', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          despesasOperacionais: parseFloat(form.despesasOperacionais) || 0,
-          comissaoVendedor: parseFloat(form.comissaoVendedor) || 0,
-          fretePercentual: form.fretePercentual ? parseFloat(form.fretePercentual) : null,
-          freteFixo: form.freteFixo ? parseFloat(form.freteFixo) : null,
-          margemLucroPadrao: parseFloat(form.margemLucroPadrao) || 0,
-        }),
+      saveConfiguracao({
+        despesasOperacionais: parseFloat(form.despesasOperacionais) || 0,
+        comissaoVendedor: parseFloat(form.comissaoVendedor) || 0,
+        fretePercentual: form.fretePercentual ? parseFloat(form.fretePercentual) : null,
+        freteFixo: form.freteFixo ? parseFloat(form.freteFixo) : null,
+        margemLucroPadrao: parseFloat(form.margemLucroPadrao) || 0,
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Erro ao salvar configuracoes');
-      }
-
       setSuccess('Configuracoes salvas com sucesso!');
       setTimeout(() => setSuccess(''), 4000);
     } catch (err) {

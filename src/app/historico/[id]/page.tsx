@@ -4,54 +4,29 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatBRL, formatPercent } from '@/lib/formatting';
-
-interface HistoricoDetail {
-  id: string;
-  produtoNome: string;
-  produtoCodigo: string;
-  perfilFiscalNome: string;
-  custoUnitario: number;
-  icms: number;
-  pis: number;
-  cofins: number;
-  ipi: number;
-  margemLucro: number;
-  comissaoVendedor: number;
-  despesasOperacionais: number;
-  fretePercentual: number | null;
-  freteFixo: number | null;
-  totalImpostos: number;
-  totalDespesas: number;
-  markupDivisor: number;
-  markupMultiplicador: number;
-  precoVenda: number;
-  lucroUnitario: number;
-  valorImpostos: number;
-  valorComissao: number;
-  valorDespesas: number;
-  valorFrete: number;
-  valorLucro: number;
-  observacao: string | null;
-  criadoEm: string;
-}
+import { getHistoricoById, type HistoricoItem } from '@/lib/storage';
 
 export default function HistoricoDetailPage() {
   const params = useParams();
   const id = params.id as string;
 
-  const [data, setData] = useState<HistoricoDetail | null>(null);
+  const [data, setData] = useState<HistoricoItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`/api/historico/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Registro nao encontrado');
-        return res.json();
-      })
-      .then(setData)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      const item = getHistoricoById(id);
+      if (!item) {
+        setError('Registro nao encontrado');
+      } else {
+        setData(item);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar registro');
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   if (loading) {

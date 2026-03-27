@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, createContext, useContext, type ReactNode } from "react";
+import { useState, useEffect, createContext, useContext, type ReactNode } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { initializeDefaults } from "@/lib/storage";
 
 interface AppShellContextValue {
   openSidebar: () => void;
@@ -21,6 +22,10 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    initializeDefaults();
+  }, []);
 
   return (
     <AppShellContext.Provider value={{ openSidebar: () => setSidebarOpen(true) }}>

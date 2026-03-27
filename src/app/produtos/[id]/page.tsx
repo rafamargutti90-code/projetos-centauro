@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { CATEGORIAS, UNIDADES } from '@/lib/constants';
+import { getProdutoById, saveProduto } from '@/lib/storage';
 
 export default function EditarProdutoPage() {
   const router = useRouter();
@@ -24,12 +25,11 @@ export default function EditarProdutoPage() {
   });
 
   useEffect(() => {
-    fetch(`/api/produtos/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Produto não encontrado');
-        return res.json();
-      })
-      .then((produto) => {
+    try {
+      const produto = getProdutoById(id);
+      if (!produto) {
+        setError('Produto não encontrado');
+      } else {
         setForm({
           codigo: produto.codigo,
           nome: produto.nome,
@@ -39,9 +39,12 @@ export default function EditarProdutoPage() {
           unidade: produto.unidade,
           ncm: produto.ncm || '',
         });
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar produto');
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -54,21 +57,16 @@ export default function EditarProdutoPage() {
     setSaving(true);
 
     try {
-      const res = await fetch(`/api/produtos/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          custoUnitario: parseFloat(form.custoUnitario),
-          ncm: form.ncm || undefined,
-        }),
+      saveProduto({
+        id,
+        codigo: form.codigo,
+        nome: form.nome,
+        categoria: form.categoria,
+        fornecedor: form.fornecedor,
+        custoUnitario: parseFloat(form.custoUnitario),
+        unidade: form.unidade,
+        ncm: form.ncm || null,
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Erro ao atualizar produto');
-      }
-
       router.push('/produtos');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao atualizar produto');
