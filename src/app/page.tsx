@@ -9,6 +9,7 @@ export default function HomePage() {
   const [resultado, setResultado] = useState<CalculoResult | null>(null);
   const [error, setError] = useState('');
   const [freteMode, setFreteMode] = useState<'percentual' | 'fixo'>('percentual');
+  const [showAjustesICMS, setShowAjustesICMS] = useState(false);
 
   const [form, setForm] = useState({
     custoUnitario: '',
@@ -16,6 +17,10 @@ export default function HomePage() {
     pis: '0.65',
     cofins: '3',
     ipi: '0',
+    reducaoBaseICMS: '0',
+    descontoICMS: '0',
+    icmsST: '0',
+    outrasDespesas: '0',
     margemLucro: '15',
     comissaoVendedor: '3',
     despesasOperacionais: '8',
@@ -51,6 +56,10 @@ export default function HomePage() {
         pis: parseFloat(form.pis),
         cofins: parseFloat(form.cofins),
         ipi: parseFloat(form.ipi),
+        reducaoBaseICMS: parseFloat(form.reducaoBaseICMS) || 0,
+        descontoICMS: parseFloat(form.descontoICMS) || 0,
+        icmsST: parseFloat(form.icmsST) || 0,
+        outrasDespesas: parseFloat(form.outrasDespesas) || 0,
         margemLucro: parseFloat(form.margemLucro),
         comissaoVendedor: parseFloat(form.comissaoVendedor),
         despesasOperacionais: parseFloat(form.despesasOperacionais),
@@ -72,15 +81,17 @@ export default function HomePage() {
   const breakdownItems = resultado
     ? [
         { label: 'Custo', valor: resultado.custoBase, color: 'bg-gray-500' },
-        { label: 'ICMS', percent: parseFloat(form.icms), valor: resultado.valorICMS, color: 'bg-red-500' },
+        { label: resultado.icmsEfetivo !== parseFloat(form.icms) ? `ICMS (efetivo)` : 'ICMS', percent: resultado.icmsEfetivo, valor: resultado.valorICMS, color: 'bg-red-500' },
         { label: 'PIS', percent: parseFloat(form.pis), valor: resultado.valorPIS, color: 'bg-red-400' },
         { label: 'COFINS', percent: parseFloat(form.cofins), valor: resultado.valorCOFINS, color: 'bg-red-300' },
         { label: 'IPI', percent: parseFloat(form.ipi), valor: resultado.valorIPI, color: 'bg-orange-400' },
+        { label: 'ICMS-ST', percent: parseFloat(form.icmsST), valor: resultado.valorICMSST, color: 'bg-orange-300' },
         { label: 'Comissao', percent: parseFloat(form.comissaoVendedor), valor: resultado.valorComissao, color: 'bg-blue-400' },
-        { label: 'Despesas', percent: parseFloat(form.despesasOperacionais), valor: resultado.valorDespesas, color: 'bg-blue-300' },
+        { label: 'Despesas Op.', percent: parseFloat(form.despesasOperacionais), valor: resultado.valorDespesas, color: 'bg-blue-300' },
+        { label: 'Outras Desp.', percent: parseFloat(form.outrasDespesas), valor: resultado.valorOutrasDespesas, color: 'bg-blue-200' },
         { label: 'Frete', percent: freteMode === 'percentual' ? parseFloat(form.fretePercentual) : null, valor: resultado.valorFrete, color: 'bg-purple-400' },
         { label: 'Lucro', percent: parseFloat(form.margemLucro), valor: resultado.valorLucro, color: 'bg-green-500' },
-      ]
+      ].filter((item) => item.valor > 0 || item.label === 'Custo')
     : [];
 
   return (
@@ -118,15 +129,34 @@ export default function HomePage() {
               <InputField label="COFINS (%)" name="cofins" value={form.cofins} onChange={handleChange} />
               <InputField label="IPI (%)" name="ipi" value={form.ipi} onChange={handleChange} />
             </div>
+
+            {/* Ajustes ICMS */}
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setShowAjustesICMS((v) => !v)}
+                className="text-xs text-[#C9A84C] font-medium hover:underline"
+              >
+                {showAjustesICMS ? '− Ocultar ajustes ICMS' : '+ Ajustes ICMS (reducao, desconto, ST)'}
+              </button>
+              {showAjustesICMS && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                  <InputField label="Reducao Base ICMS (%)" name="reducaoBaseICMS" value={form.reducaoBaseICMS} onChange={handleChange} hint="Ex: 61.11 para cesta basica" />
+                  <InputField label="Desconto ICMS (%)" name="descontoICMS" value={form.descontoICMS} onChange={handleChange} hint="Credito presumido, etc." />
+                  <InputField label="ICMS-ST (%)" name="icmsST" value={form.icmsST} onChange={handleChange} hint="Substituicao tributaria" />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Despesas e Margem */}
           <div className="bg-white rounded-xl shadow-sm p-4">
             <h3 className="text-sm font-semibold text-[#1B2A4A] mb-3">Despesas e Margem</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <InputField label="Margem de Lucro (%)" name="margemLucro" value={form.margemLucro} onChange={handleChange} />
               <InputField label="Comissao (%)" name="comissaoVendedor" value={form.comissaoVendedor} onChange={handleChange} />
               <InputField label="Despesas Op. (%)" name="despesasOperacionais" value={form.despesasOperacionais} onChange={handleChange} />
+              <InputField label="Outras Desp. (%)" name="outrasDespesas" value={form.outrasDespesas} onChange={handleChange} hint="Opcional" />
             </div>
           </div>
 
@@ -209,7 +239,11 @@ export default function HomePage() {
                 <SummaryCard label="Custo Base" value={formatBRL(resultado.custoBase)} />
                 <SummaryCard label="Lucro Unitario" value={formatBRL(resultado.lucroUnitario)} highlight />
                 <SummaryCard label="Margem Real" value={formatPercent(resultado.margemReal)} highlight={resultado.margemReal >= 5} warn={resultado.margemReal < 5} />
-                <SummaryCard label="Markup Divisor" value={resultado.markupDivisor.toFixed(4)} />
+                {resultado.icmsEfetivo !== parseFloat(form.icms) ? (
+                  <SummaryCard label="ICMS Efetivo" value={formatPercent(resultado.icmsEfetivo)} />
+                ) : (
+                  <SummaryCard label="Markup Divisor" value={resultado.markupDivisor.toFixed(4)} />
+                )}
               </div>
 
               {/* Composition bar + breakdown */}
@@ -268,11 +302,13 @@ function InputField({
   name,
   value,
   onChange,
+  hint,
 }: {
   label: string;
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  hint?: string;
 }) {
   return (
     <div>
@@ -284,6 +320,7 @@ function InputField({
         onChange={onChange}
         min="0"
         step="0.01"
+        placeholder={hint}
         className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#C9A84C] text-sm"
       />
     </div>
