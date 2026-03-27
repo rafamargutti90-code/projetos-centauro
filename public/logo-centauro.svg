@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none">
+  <!-- Red swoosh accent -->
+  <path d="M140 5 C160 5, 175 20, 170 45 C168 55, 158 70, 145 75" stroke="#CC2229" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <!-- Blue swoosh -->
+  <ellipse cx="130" cy="40" rx="60" ry="28" stroke="#1E3A8A" stroke-width="3" fill="none" transform="rotate(-15, 130, 40)" opacity="0.5"/>
+  <!-- Text: CENTAURO -->
+  <text x="58" y="52" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="38" fill="white" letter-spacing="2">CENT</text>
+  <text x="190" y="52" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="38" fill="white" letter-spacing="2">URO</text>
+  <!-- DISTRIBUIDORA -->
+  <text x="80" y="22" font-family="Arial, sans-serif" font-weight="600" font-size="9" fill="white" letter-spacing="4" opacity="0.8">DISTRIBUIDORA</text>
+  <!-- COMERCIAL MARGUTTI | DESDE 1994 -->
+  <text x="72" y="68" font-family="Arial, sans-serif" font-weight="400" font-size="7.5" fill="white" letter-spacing="2" opacity="0.7">COMERCIAL MARGUTTI  ·  DESDE 1994</text>
+</svg>

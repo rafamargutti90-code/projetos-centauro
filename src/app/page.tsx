@@ -105,7 +105,7 @@ export default function HomePage() {
         <div className="lg:col-span-3 space-y-4">
           {/* Custo */}
           <div className="bg-white rounded-xl shadow-sm p-4">
-            <label className="block text-sm font-semibold text-[#1B2A4A] mb-2">
+            <label className="block text-sm font-semibold text-[#1E3A8A] mb-2">
               Custo Unitario (R$)
             </label>
             <input
@@ -116,13 +116,13 @@ export default function HomePage() {
               min="0.01"
               step="0.01"
               placeholder="Ex: 18.50"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#C9A84C] text-lg font-medium"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#CC2229] text-lg font-medium"
             />
           </div>
 
           {/* Impostos */}
           <div className="bg-white rounded-xl shadow-sm p-4">
-            <h3 className="text-sm font-semibold text-[#1B2A4A] mb-3">Impostos</h3>
+            <h3 className="text-sm font-semibold text-[#1E3A8A] mb-3">Impostos</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <InputField label="ICMS (%)" name="icms" value={form.icms} onChange={handleChange} />
               <InputField label="PIS (%)" name="pis" value={form.pis} onChange={handleChange} />
@@ -135,7 +135,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => setShowAjustesICMS((v) => !v)}
-                className="text-xs text-[#C9A84C] font-medium hover:underline"
+                className="text-xs text-[#CC2229] font-medium hover:underline"
               >
                 {showAjustesICMS ? '− Ocultar ajustes ICMS' : '+ Ajustes ICMS (reducao, desconto, ST)'}
               </button>
@@ -151,7 +151,7 @@ export default function HomePage() {
 
           {/* Despesas e Margem */}
           <div className="bg-white rounded-xl shadow-sm p-4">
-            <h3 className="text-sm font-semibold text-[#1B2A4A] mb-3">Despesas e Margem</h3>
+            <h3 className="text-sm font-semibold text-[#1E3A8A] mb-3">Despesas e Margem</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <InputField label="Margem de Lucro (%)" name="margemLucro" value={form.margemLucro} onChange={handleChange} />
               <InputField label="Comissao (%)" name="comissaoVendedor" value={form.comissaoVendedor} onChange={handleChange} />
@@ -163,14 +163,14 @@ export default function HomePage() {
           {/* Frete */}
           <div className="bg-white rounded-xl shadow-sm p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-[#1B2A4A]">Frete</h3>
+              <h3 className="text-sm font-semibold text-[#1E3A8A]">Frete</h3>
               <div className="flex bg-gray-100 rounded-lg overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setFreteMode('percentual')}
                   className={`px-3 py-1.5 text-xs font-medium transition ${
                     freteMode === 'percentual'
-                      ? 'bg-[#1B2A4A] text-white'
+                      ? 'bg-[#1E3A8A] text-white'
                       : 'text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -181,7 +181,7 @@ export default function HomePage() {
                   onClick={() => setFreteMode('fixo')}
                   className={`px-3 py-1.5 text-xs font-medium transition ${
                     freteMode === 'fixo'
-                      ? 'bg-[#1B2A4A] text-white'
+                      ? 'bg-[#1E3A8A] text-white'
                       : 'text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -201,7 +201,7 @@ export default function HomePage() {
             <button
               onClick={handleCalcular}
               disabled={!form.custoUnitario}
-              className="flex-1 bg-[#C9A84C] text-white py-3 rounded-lg hover:opacity-90 transition font-semibold text-lg disabled:opacity-50"
+              className="flex-1 bg-[#CC2229] text-white py-3 rounded-lg hover:bg-[#B01E24] transition font-semibold text-lg disabled:opacity-50"
             >
               Calcular Preco
             </button>
@@ -219,8 +219,8 @@ export default function HomePage() {
           {resultado ? (
             <div className="space-y-4 lg:sticky lg:top-6">
               {/* Main price card */}
-              <div className="bg-[#1B2A4A] rounded-xl p-5 text-center">
-                <div className="text-[#C9A84C] text-xs font-medium tracking-wider uppercase mb-1">Preco de Venda</div>
+              <div className="bg-[#1E3A8A] rounded-xl p-5 text-center">
+                <div className="text-blue-200 text-xs font-medium tracking-wider uppercase mb-1">Preco de Venda</div>
                 <div className="text-white text-4xl font-bold">{formatBRL(resultado.precoVendaFinal)}</div>
                 <div className="text-gray-400 text-sm mt-2">
                   Markup {resultado.markupMultiplicador.toFixed(2)}x
@@ -248,7 +248,7 @@ export default function HomePage() {
 
               {/* Composition bar + breakdown */}
               <div className="bg-white rounded-xl shadow-sm p-4">
-                <h3 className="text-sm font-semibold text-[#1B2A4A] mb-3">Composicao do Preco</h3>
+                <h3 className="text-sm font-semibold text-[#1E3A8A] mb-3">Composicao do Preco</h3>
                 <div className="flex h-5 rounded-lg overflow-hidden mb-3">
                   {breakdownItems
                     .filter((item) => item.valor > 0)
@@ -275,12 +275,12 @@ export default function HomePage() {
                           <span className="text-gray-400 text-xs">({formatPercent(item.percent)})</span>
                         )}
                       </div>
-                      <span className="font-medium text-[#1B2A4A]">{formatBRL(item.valor)}</span>
+                      <span className="font-medium text-[#1E3A8A]">{formatBRL(item.valor)}</span>
                     </div>
                   ))}
                   <div className="flex items-center justify-between text-sm font-bold border-t border-gray-200 pt-2 mt-2">
-                    <span className="text-[#1B2A4A]">Total</span>
-                    <span className="text-[#1B2A4A]">{formatBRL(resultado.precoVendaFinal)}</span>
+                    <span className="text-[#1E3A8A]">Total</span>
+                    <span className="text-[#1E3A8A]">{formatBRL(resultado.precoVendaFinal)}</span>
                   </div>
                 </div>
               </div>
@@ -321,7 +321,7 @@ function InputField({
         min="0"
         step="0.01"
         placeholder={hint}
-        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#C9A84C] text-sm"
+        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#CC2229] text-sm"
       />
     </div>
   );
@@ -341,7 +341,7 @@ function SummaryCard({
   return (
     <div className="bg-white rounded-xl shadow-sm p-3 text-center">
       <div className="text-xs text-gray-500 mb-1">{label}</div>
-      <div className={`font-bold text-sm ${warn ? 'text-red-600' : highlight ? 'text-green-600' : 'text-[#1B2A4A]'}`}>
+      <div className={`font-bold text-sm ${warn ? 'text-red-600' : highlight ? 'text-green-600' : 'text-[#1E3A8A]'}`}>
         {value}
       </div>
     </div>
