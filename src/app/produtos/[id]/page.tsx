@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft, Save } from 'lucide-react';
 import { CATEGORIAS, UNIDADES } from '@/lib/constants';
 import { getProdutoById, saveProduto } from '@/lib/storage';
 
@@ -84,29 +85,30 @@ export default function EditarProdutoPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <div className="mb-6">
-        <Link href="/produtos" className="text-[#C9A84C] hover:underline text-sm">
-          &larr; Voltar para Produtos
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto">
+      <div className="mb-4 sm:mb-6">
+        <Link href="/produtos" className="inline-flex items-center gap-1 text-[#C9A84C] hover:underline text-sm">
+          <ArrowLeft size={14} />
+          Voltar para Produtos
         </Link>
-        <h1 className="text-3xl font-bold text-[#1B2A4A] mt-2">Editar Produto</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#1B2A4A] mt-2">Editar Produto</h1>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">{error}</div>
+        <div className="bg-red-50 text-red-600 p-3 sm:p-4 rounded-lg mb-4 text-sm">{error}</div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[#1B2A4A] mb-1">Código *</label>
+            <label className="block text-sm font-medium text-[#1B2A4A] mb-1">Código (SKU) *</label>
             <input
               type="text"
               name="codigo"
               value={form.codigo}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
             />
           </div>
           <div>
@@ -117,7 +119,7 @@ export default function EditarProdutoPage() {
               value={form.nome}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
             />
           </div>
         </div>
@@ -130,7 +132,7 @@ export default function EditarProdutoPage() {
               value={form.categoria}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
             >
               <option value="">Selecione...</option>
               {CATEGORIAS.map((cat) => (
@@ -146,14 +148,14 @@ export default function EditarProdutoPage() {
               value={form.fornecedor}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[#1B2A4A] mb-1">Custo Unitário (R$) *</label>
+            <label className="block text-sm font-medium text-[#1B2A4A] mb-1">Custo (R$) *</label>
             <input
               type="number"
               name="custoUnitario"
@@ -162,7 +164,7 @@ export default function EditarProdutoPage() {
               required
               min="0.01"
               step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
             />
           </div>
           <div>
@@ -171,14 +173,14 @@ export default function EditarProdutoPage() {
               name="unidade"
               value={form.unidade}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
             >
               {UNIDADES.map((u) => (
                 <option key={u.value} value={u.value}>{u.label} ({u.value})</option>
               ))}
             </select>
           </div>
-          <div>
+          <div className="col-span-2 sm:col-span-1">
             <label className="block text-sm font-medium text-[#1B2A4A] mb-1">NCM</label>
             <input
               type="text"
@@ -186,22 +188,23 @@ export default function EditarProdutoPage() {
               value={form.ncm}
               onChange={handleChange}
               placeholder="Ex: 1006.30.21"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
             />
           </div>
         </div>
 
-        <div className="flex gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             type="submit"
             disabled={saving}
-            className="bg-[#C9A84C] text-white px-6 py-2 rounded-lg hover:opacity-90 transition font-medium disabled:opacity-50"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#C9A84C] text-white px-6 py-2.5 rounded-lg hover:opacity-90 transition font-medium disabled:opacity-50"
           >
+            <Save size={16} />
             {saving ? 'Salvando...' : 'Atualizar Produto'}
           </button>
           <Link
             href="/produtos"
-            className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium"
+            className="flex-1 sm:flex-none text-center bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg hover:bg-gray-300 transition font-medium"
           >
             Cancelar
           </Link>

@@ -169,16 +169,16 @@ export default function CalculadoraPage() {
     : [];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-[#1B2A4A] mb-6">Calculadora de Precos</h1>
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold text-[#1B2A4A] mb-4 sm:mb-6">Calculadora de Precos</h1>
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">{error}</div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* LEFT: Form */}
-        <div className="bg-white rounded-xl shadow-md p-6 space-y-4">
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-4">
           <h2 className="text-lg font-semibold text-[#1B2A4A] border-b border-gray-200 pb-2">
             Dados do Calculo
           </h2>
@@ -387,11 +387,11 @@ export default function CalculadoraPage() {
         {/* RIGHT: Result */}
         <div>
           {resultado ? (
-            <div className="bg-white rounded-xl shadow-md p-6 space-y-5">
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-5">
               {/* Main price */}
-              <div className="bg-[#1B2A4A] rounded-xl p-6 text-center">
+              <div className="bg-[#1B2A4A] rounded-xl p-4 sm:p-6 text-center">
                 <div className="text-[#C9A84C] text-sm font-medium mb-1">Preco de Venda</div>
-                <div className="text-white text-4xl font-bold">
+                <div className="text-white text-3xl sm:text-4xl font-bold">
                   {formatBRL(resultado.precoVendaFinal)}
                 </div>
                 <div className="text-gray-300 text-sm mt-2">
@@ -501,9 +501,9 @@ export default function CalculadoraPage() {
               </button>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-md p-12 text-center text-gray-400">
-              <div className="text-5xl mb-4">&#9881;</div>
-              <p className="text-lg">Preencha os dados e clique em Calcular para ver o resultado.</p>
+            <div className="bg-white rounded-xl shadow-md p-8 sm:p-12 text-center text-gray-400">
+              <div className="text-4xl sm:text-5xl mb-4">&#9881;</div>
+              <p className="text-base sm:text-lg">Preencha os dados e clique em Calcular para ver o resultado.</p>
             </div>
           )}
         </div>

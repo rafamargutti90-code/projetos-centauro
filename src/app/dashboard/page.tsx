@@ -56,24 +56,24 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-[#1B2A4A] mb-8">Dashboard</h1>
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold text-[#1B2A4A] mb-6 sm:mb-8">Dashboard</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
         {cards.map((card) => (
           <div
             key={card.label}
-            className="bg-white rounded-xl shadow-md p-6 border-l-4 border-[#C9A84C]"
+            className="bg-white rounded-xl shadow-md p-3 sm:p-6 border-l-4 border-[#C9A84C]"
           >
-            <div className="text-sm text-gray-500 mb-1">{card.label}</div>
-            <div className="text-3xl font-bold text-[#1B2A4A]">{card.value}</div>
+            <div className="text-xs sm:text-sm text-gray-500 mb-1">{card.label}</div>
+            <div className="text-xl sm:text-3xl font-bold text-[#1B2A4A]">{card.value}</div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-[#1B2A4A]">Ultimos Calculos</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-[#1B2A4A]">Ultimos Calculos</h2>
           <Link
             href="/historico"
             className="text-[#C9A84C] hover:underline text-sm font-medium"
@@ -119,7 +119,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8">
         <Link
           href="/calculadora"
           className="bg-[#C9A84C] text-white rounded-xl p-6 text-center hover:opacity-90 transition font-semibold text-lg shadow-md"

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Download, Trash2, Eye } from 'lucide-react';
 import { formatBRL, formatPercent } from '@/lib/formatting';
 import { getHistorico, deleteHistoricoItem, exportHistoricoCSV } from '@/lib/storage';
 
@@ -67,16 +68,18 @@ export default function HistoricoPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-bold text-[#1B2A4A]">Historico de Calculos</h1>
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#1B2A4A]">Histórico</h1>
         {historicos.length > 0 && (
           <button
             onClick={handleExportar}
             disabled={exporting}
-            className="bg-[#1B2A4A] text-white px-6 py-2 rounded-lg hover:opacity-90 transition font-medium disabled:opacity-50"
+            className="flex items-center gap-2 bg-[#1B2A4A] text-white px-4 sm:px-6 py-2 rounded-lg hover:opacity-90 transition font-medium text-sm disabled:opacity-50"
           >
-            {exporting ? 'Exportando...' : 'Exportar CSV'}
+            <Download size={16} />
+            <span className="hidden sm:inline">{exporting ? 'Exportando...' : 'Exportar CSV'}</span>
+            <span className="sm:hidden">CSV</span>
           </button>
         )}
       </div>
@@ -89,7 +92,44 @@ export default function HistoricoPage() {
         </div>
       ) : (
         <>
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          {/* Mobile: Card view */}
+          <div className="sm:hidden space-y-3">
+            {historicos.map((h) => (
+              <div key={h.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-[#1B2A4A] truncate">{h.produtoNome}</div>
+                    <div className="text-xs font-mono text-gray-500">{h.produtoCodigo}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-[#1B2A4A]">{formatBRL(h.precoVenda)}</div>
+                    <div className="text-xs text-gray-400">{formatPercent(h.margemLucro)} margem</div>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-400 mb-3">
+                  {new Date(h.criadoEm).toLocaleDateString('pt-BR')}
+                </div>
+                <div className="flex items-center gap-2 border-t border-gray-100 pt-3">
+                  <Link
+                    href={`/historico/${h.id}`}
+                    className="flex-1 flex items-center justify-center gap-1.5 bg-[#C9A84C] text-white py-2 rounded-lg text-sm font-medium hover:opacity-90 transition"
+                  >
+                    <Eye size={14} />
+                    Ver
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(h.id)}
+                    className="flex items-center justify-center gap-1.5 bg-red-50 text-red-600 py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-100 transition"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: Table view */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-md overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -149,14 +189,14 @@ export default function HistoricoPage() {
                 Anterior
               </button>
               <span className="text-sm text-gray-600">
-                Pagina {pagination.page} de {pagination.totalPages} ({pagination.total} registros)
+                {pagination.page} de {pagination.totalPages}
               </span>
               <button
                 onClick={() => loadHistorico(pagination.page + 1)}
                 disabled={pagination.page === pagination.totalPages}
                 className="px-4 py-2 rounded-lg border border-gray-300 text-sm disabled:opacity-50 hover:bg-gray-50"
               >
-                Proxima
+                Próxima
               </button>
             </div>
           )}

@@ -39,11 +39,11 @@ export default function HistoricoDetailPage() {
 
   if (error || !data) {
     return (
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="p-4 sm:p-6 max-w-4xl mx-auto">
         <Link href="/historico" className="text-[#C9A84C] hover:underline text-sm">
           &larr; Voltar para Historico
         </Link>
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg mt-4">{error || 'Registro nao encontrado'}</div>
+        <div className="bg-red-50 text-red-600 p-3 sm:p-4 rounded-lg mt-4 text-sm">{error || 'Registro nao encontrado'}</div>
       </div>
     );
   }
@@ -81,27 +81,27 @@ export default function HistoricoDetailPage() {
   ];
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="mb-6">
-        <Link href="/historico" className="text-[#C9A84C] hover:underline text-sm">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto">
+      <div className="mb-4 sm:mb-6">
+        <Link href="/historico" className="inline-flex items-center gap-1 text-[#C9A84C] hover:underline text-sm">
           &larr; Voltar para Historico
         </Link>
-        <h1 className="text-3xl font-bold text-[#1B2A4A] mt-2">Detalhe do Calculo</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#1B2A4A] mt-2">Detalhe do Cálculo</h1>
       </div>
 
       {/* Big price */}
-      <div className="bg-[#1B2A4A] rounded-xl p-6 text-center mb-6">
+      <div className="bg-[#1B2A4A] rounded-xl p-4 sm:p-6 text-center mb-4 sm:mb-6">
         <div className="text-[#C9A84C] text-sm font-medium mb-1">Preco de Venda</div>
-        <div className="text-white text-4xl font-bold">{formatBRL(data.precoVenda)}</div>
+        <div className="text-white text-3xl sm:text-4xl font-bold">{formatBRL(data.precoVenda)}</div>
         <div className="text-gray-300 text-sm mt-2">
           Markup: {data.markupMultiplicador.toFixed(4)}x | Lucro: {formatBRL(data.lucroUnitario)}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {/* Info */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4 border-b pb-2">Informacoes</h2>
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+          <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4 border-b pb-2">Informações</h2>
           <dl className="space-y-2">
             {infoRows.map((row) => (
               <div key={row.label} className="flex justify-between">
@@ -113,8 +113,8 @@ export default function HistoricoDetailPage() {
         </div>
 
         {/* Input params */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4 border-b pb-2">Parametros de Entrada</h2>
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+          <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4 border-b pb-2">Parâmetros de Entrada</h2>
           <dl className="space-y-2">
             {inputRows.map((row) => (
               <div key={row.label} className="flex justify-between">
@@ -127,7 +127,7 @@ export default function HistoricoDetailPage() {
       </div>
 
       {/* Results */}
-      <div className="bg-white rounded-xl shadow-md p-6 mt-6">
+      <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mt-4 sm:mt-6">
         <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4 border-b pb-2">Resultados Detalhados</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
           {resultRows.map((row) => (

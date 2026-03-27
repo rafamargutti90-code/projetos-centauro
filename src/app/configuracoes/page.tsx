@@ -71,8 +71,8 @@ export default function ConfiguracoesPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-[#1B2A4A] mb-6">Configuracoes</h1>
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold text-[#1B2A4A] mb-4 sm:mb-6">Configurações</h1>
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">{error}</div>
@@ -84,7 +84,7 @@ export default function ConfiguracoesPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 space-y-5">
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-5">
         <p className="text-sm text-gray-500 mb-2">
           Estes valores serao usados como padrao na calculadora de precos. Voce pode alterar individualmente em cada calculo.
         </p>

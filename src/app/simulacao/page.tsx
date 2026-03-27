@@ -177,9 +177,9 @@ export default function SimulacaoPage() {
     : null;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-bold text-[#1B2A4A]">Simulacao de Cenarios</h1>
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#1B2A4A]">Simulação</h1>
         <div className="flex gap-2">
           {cenarios.length < 3 && (
             <button
@@ -200,7 +200,7 @@ export default function SimulacaoPage() {
         </div>
       </div>
 
-      <div className={`grid gap-6 ${cenarios.length === 1 ? 'grid-cols-1 max-w-xl' : cenarios.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
+      <div className={`grid gap-4 sm:gap-6 ${cenarios.length === 1 ? 'grid-cols-1 max-w-xl' : cenarios.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
         {cenarios.map((cenario) => (
           <div key={cenario.id} className="bg-white rounded-xl shadow-md p-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -331,7 +331,7 @@ export default function SimulacaoPage() {
 
       {/* Comparison table */}
       {resultados.length > 1 && (
-        <div className="bg-white rounded-xl shadow-md p-6 mt-6">
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mt-4 sm:mt-6">
           <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4">Comparativo</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

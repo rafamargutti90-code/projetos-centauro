@@ -54,19 +54,19 @@ export default function NovoPerfilFiscalPage() {
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <div className="mb-6">
-        <Link href="/perfis-fiscais" className="text-[#C9A84C] hover:underline text-sm">
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto">
+      <div className="mb-4 sm:mb-6">
+        <Link href="/perfis-fiscais" className="inline-flex items-center gap-1 text-[#C9A84C] hover:underline text-sm">
           &larr; Voltar para Perfis Fiscais
         </Link>
-        <h1 className="text-3xl font-bold text-[#1B2A4A] mt-2">Novo Perfil Fiscal</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#1B2A4A] mt-2">Novo Perfil Fiscal</h1>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">{error}</div>
+        <div className="bg-red-50 text-red-600 p-3 sm:p-4 rounded-lg mb-4 text-sm">{error}</div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-4">
         <div>
           <label className="block text-sm font-medium text-[#1B2A4A] mb-1">Nome *</label>
           <input
@@ -175,17 +175,17 @@ export default function NovoPerfilFiscalPage() {
           </div>
         </div>
 
-        <div className="flex gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="bg-[#C9A84C] text-white px-6 py-2 rounded-lg hover:opacity-90 transition font-medium disabled:opacity-50"
+            className="flex-1 sm:flex-none bg-[#C9A84C] text-white px-6 py-2.5 rounded-lg hover:opacity-90 transition font-medium disabled:opacity-50"
           >
             {loading ? 'Salvando...' : 'Salvar Perfil'}
           </button>
           <Link
             href="/perfis-fiscais"
-            className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium"
+            className="flex-1 sm:flex-none text-center bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg hover:bg-gray-300 transition font-medium"
           >
             Cancelar
           </Link>
