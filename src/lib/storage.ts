@@ -103,33 +103,25 @@ function setItem<T>(key: string, value: T): void {
 }
 
 // --- Initialize defaults (seed data) ---
+const SEED_VERSION = '2'; // bump to force re-seed
+
 export function initializeDefaults(): void {
   if (typeof window === 'undefined') return;
-  if (localStorage.getItem(KEYS.initialized)) return;
+  if (localStorage.getItem(KEYS.initialized) === SEED_VERSION) return;
+
+  // Clear old data on version bump
+  localStorage.removeItem(KEYS.perfisFiscais);
+  localStorage.removeItem(KEYS.configuracao);
+  localStorage.removeItem(KEYS.produtos);
+  localStorage.removeItem(KEYS.historico);
 
   const now = new Date().toISOString();
 
   // Default tax profiles
   const defaultPerfis: PerfilFiscal[] = [
     {
-      id: generateId(), nome: 'Lucro Presumido - Padrão BA', descricao: 'Regime de Lucro Presumido com alíquotas padrão BA',
+      id: generateId(), nome: 'Lucro Presumido BA', descricao: 'Regime de Lucro Presumido - Bahia',
       icms: 18, pis: 0.65, cofins: 3, ipi: 0, icmsST: null, padrao: true, ativo: true, criadoEm: now, atualizadoEm: now,
-    },
-    {
-      id: generateId(), nome: 'Lucro Real - Padrão BA', descricao: 'Regime de Lucro Real com alíquotas padrão BA',
-      icms: 18, pis: 1.65, cofins: 7.6, ipi: 0, icmsST: null, padrao: false, ativo: true, criadoEm: now, atualizadoEm: now,
-    },
-    {
-      id: generateId(), nome: 'Simples Nacional - Faixa 1', descricao: 'Simples Nacional faixa inicial',
-      icms: 0, pis: 0, cofins: 0, ipi: 0, icmsST: null, padrao: false, ativo: true, criadoEm: now, atualizadoEm: now,
-    },
-    {
-      id: generateId(), nome: 'ICMS-ST (Substituído)', descricao: 'Produtos com substituição tributária de ICMS',
-      icms: 0, pis: 0.65, cofins: 3, ipi: 0, icmsST: null, padrao: false, ativo: true, criadoEm: now, atualizadoEm: now,
-    },
-    {
-      id: generateId(), nome: 'Bebidas com IPI', descricao: 'Perfil para bebidas com incidência de IPI',
-      icms: 18, pis: 0.65, cofins: 3, ipi: 5, icmsST: null, padrao: false, ativo: true, criadoEm: now, atualizadoEm: now,
     },
   ];
 
@@ -175,7 +167,7 @@ export function initializeDefaults(): void {
   setItem(KEYS.configuracao, defaultConfig);
   setItem(KEYS.produtos, defaultProdutos);
   setItem(KEYS.historico, []);
-  localStorage.setItem(KEYS.initialized, 'true');
+  localStorage.setItem(KEYS.initialized, SEED_VERSION);
 }
 
 // --- Produtos ---
